@@ -10,7 +10,26 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_11_170544) do
+ActiveRecord::Schema.define(version: 2019_12_11_174032) do
+
+  create_table "movies", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.boolean "adult", default: false, null: false
+    t.string "poster_path"
+    t.string "homepage"
+    t.integer "api_id"
+    t.integer "imdb_id"
+    t.string "title"
+    t.text "overview"
+    t.integer "popularity"
+    t.datetime "release_date"
+    t.integer "revenue"
+    t.string "status"
+    t.string "tagline"
+    t.integer "vote_average"
+    t.integer "vote_count"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "searches", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "criteria"
