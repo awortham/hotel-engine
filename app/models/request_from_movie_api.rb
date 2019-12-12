@@ -47,7 +47,11 @@ class RequestFromMovieApi
 
   def request(url, params = request_params)
     response = Faraday.get(url, params)
+
     JSON.parse(response.body).deep_symbolize_keys
+
+  rescue JSON::ParserError
+    params == request_params ? {} : { results: [] }
   end
 
   def request_params

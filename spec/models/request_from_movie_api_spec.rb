@@ -18,6 +18,18 @@ describe RequestFromMovieApi do
            to_return(status: 200, body: movie.to_json, headers: {})
       expect { subject.get_movie }.to change { Movie.count }.by 1
     end
+
+    it 'handles a json octet error' do
+      stub_request(:get, "https://api.themoviedb.org/3/movie/330457?api_key=#{HotelEngine::Application.credentials.movie_api_key}").
+         with(
+           headers: {
+          'Accept'=>'*/*',
+          'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+          'User-Agent'=>'Faraday v0.15.4'
+           }).
+           to_return(status: 200, body: '', headers: {})
+       expect { subject.get_movie }.to_not raise_error
+    end
   end
 
   context '#search' do
@@ -33,6 +45,18 @@ describe RequestFromMovieApi do
            }).
            to_return(status: 200, body: movie_collection.to_json, headers: {})
       expect { subject.search }.to change { Movie.count }.by 1
+    end
+
+    it 'handles a json octet error' do
+      stub_request(:get, "https://api.themoviedb.org/3/search/movie?api_key=#{HotelEngine::Application.credentials.movie_api_key}&page=1&query=frozen").
+         with(
+           headers: {
+          'Accept'=>'*/*',
+          'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+          'User-Agent'=>'Faraday v0.15.4'
+           }).
+           to_return(status: 200, body: '', headers: {})
+       expect { subject.search }.to_not raise_error
     end
   end
 
