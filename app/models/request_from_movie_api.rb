@@ -1,10 +1,10 @@
 class RequestFromMovieApi
-  attr_reader :id, :query, :params, :page
+  attr_reader :id, :query, :page
 
   MOVIE_ATTRS = [
     :adult,
-    :homepage,
     :api_id,
+    :homepage,
     :imdb_id,
     :overview,
     :popularity,
@@ -15,12 +15,12 @@ class RequestFromMovieApi
     :tagline,
     :title,
     :vote_average,
-    :vote_count]
+    :vote_count
+  ]
 
   def initialize(params)
     @id = params[:id].to_s
     @query = params[:query]
-    @params = params
     @page = params[:page]
   end
 
@@ -39,10 +39,18 @@ class RequestFromMovieApi
 
   private
 
+  def api_key
+    HotelEngine::Application.credentials.movie_api_key
+  end
+
   def create_movie(movie_data)
     movie_data[:api_id] = movie_data[:id]
     movie_data.slice!(*MOVIE_ATTRS)
     Movie.find_or_create_by(movie_data)
+  end
+
+  def movie_url
+    "#{url_base}/movie/#{id}"
   end
 
   def request(url, params = request_params)
@@ -62,19 +70,11 @@ class RequestFromMovieApi
     request_params.merge({ query: query, page: page })
   end
 
-  def movie_url
-    "#{url_base}/movie/#{id}"
-  end
-
   def search_url
     "#{url_base}/search/movie"
   end
 
   def url_base
     "https://api.themoviedb.org/3"
-  end
-
-  def api_key
-    HotelEngine::Application.credentials.movie_api_key
   end
 end
