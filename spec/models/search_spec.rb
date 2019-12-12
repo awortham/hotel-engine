@@ -1,6 +1,16 @@
 require 'rails_helper'
 
 describe Search do
+  describe 'relationships' do
+    let(:movie) { Movie.create(title: 'Frozen') }
+    let(:search) { Search.create(criteria: 'query=frozen') }
+    before { search.movies << movie }
+
+    it 'has many movies' do
+      expect(search.movies).to include movie
+    end
+  end
+
   describe '#criteria' do
     let!(:search) { Search.create(criteria: '?query=frozen&page=1') }
 
