@@ -9,7 +9,7 @@ class Api::V1::MoviesController < ApplicationController
       @movies = Movie.all
     end
 
-    render json: @movies
+    render json: sorted_movies
   end
 
   def show
@@ -54,6 +54,12 @@ class Api::V1::MoviesController < ApplicationController
     else
       @movies = RequestFromMovieApi.new(params).search
     end
+  end
+
+  def sorted_movies
+    @movies.order(title: params[:sort])
+  rescue ArgumentError
+    @movies
   end
 
   def movie_params

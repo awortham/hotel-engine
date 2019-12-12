@@ -21,8 +21,45 @@ describe Api::V1::MoviesController do
   end
 
   describe '#index' do
+    context 'when sort param is passed' do
+      let!(:movie2) { Movie.create(title: 'Frozen') }
+      let!(:movie1) { Movie.create(title: 'Aladdin') }
+      let!(:movie3) { Movie.create(title: 'Zootopia') }
+
+      context 'when sort is asc' do
+        it 'returns the movies in ascending order' do
+          get :index, params: { sort: 'asc' }
+
+          titles = JSON.parse(response.body).map { |movie| movie['title'] }
+
+          expect(titles).to eq %w(Aladdin Frozen Zootopia)
+        end
+      end
+
+      context 'when sort is desc' do
+        it 'returns the movies in descending order' do
+          get :index, params: { sort: 'desc' }
+
+          titles = JSON.parse(response.body).map { |movie| movie['title'] }
+
+          expect(titles).to eq %w(Zootopia Frozen Aladdin)
+        end
+      end
+
+      context 'when sort is blimey' do
+        it 'returns default collection' do
+          get :index, params: { sort: 'blimey' }
+
+          titles = JSON.parse(response.body).map { |movie| movie['title'] }
+
+          expect(titles).to eq %w(Frozen Aladdin Zootopia)
+        end
+      end
+    end
+
     context 'when no search params' do
       let!(:movie) { Movie.create(title: 'Frozen') }
+
       it 'returns the movies currently in the db' do
         get :index
 
@@ -31,14 +68,11 @@ describe Api::V1::MoviesController do
     end
 
     context 'when search params are passed' do
-      # should look at search params and check the db for any searches that match
       context 'for the first time' do
         let!(:movie) { Movie.create(title: 'Frozen') }
-        # if it matches then return the match results
-        # add match results (a list of ids) to the searches table
-        # this should save all incoming data as well as a search record with cooresponding ids and criteria string
+
         it 'calls RequestFromMovieApi' do
-          allow_any_instance_of(RequestFromMovieApi).to receive(:search).and_return movie
+          allow_any_instance_of(RequestFromMovieApi).to receive(:search).and_return Movie.where(title: 'Frozen')
 
           get :index, params: { query: 'frozen' }
 
@@ -56,14 +90,6 @@ describe Api::V1::MoviesController do
           expect(JSON.parse(response.body).length).to eq 1
         end
       end
-    end
-
-    context 'when the returning collection has an id of a movie that was deleted' do
-      # make sure to account for an id in results record that has been destroyed
-    end
-
-    context 'when a query was malformed' do
-      # make sure to handle a mis formed query and return an error to the user (don't blow up)
     end
   end
 
