@@ -19,9 +19,9 @@ class RequestFromMovieApi
   ]
 
   def initialize(params)
-    @id = params[:id].to_s
+    @id    = params[:id].to_s
     @query = params[:query]
-    @page = params[:page]
+    @page  = params[:page]
   end
 
   def get_movie
