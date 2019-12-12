@@ -1,8 +1,14 @@
 class Api::V1::MoviesController < ApplicationController
-  before_action :set_movie, only: [:show, :update, :destroy]
+  before_action :set_movie, only: :show
+  before_action :find_movie, only: [:update, :destroy]
 
   def index
-    @movies = Movie.all
+    if params[:query]
+      set_movies_with_query_params
+    else
+      @movies = Movie.all
+    end
+
     render json: @movies
   end
 
@@ -11,7 +17,8 @@ class Api::V1::MoviesController < ApplicationController
   end
 
   def create
-    @movie = Movie.new(movie_params)
+    @movie = Movie.find_or_initialize_by(title: movie_params[:title])
+    @movie.assign_attributes(movie_params)
     if @movie.save
       render json: @movie, status: :created, location: api_v1_movie_url(@movie)
     else
@@ -34,10 +41,37 @@ class Api::V1::MoviesController < ApplicationController
   private
 
   def set_movie
+    @movie = Movie.find_by(params[:id]) || RequestFromMovieApi.new(params).get_movie
+  end
+
+  def find_movie
     @movie = Movie.find(params[:id])
   end
 
+  def set_movies_with_query_params
+    if search = Search.find_by(criteria: request.query_string)
+      @movies = search.movies
+    else
+      @movies = RequestFromMovieApi.new(params).search
+    end
+  end
+
   def movie_params
-    params.require(:movie).permit(:title, :content, :slug)
+    params.require(:movie).permit(
+      :adult,
+      :homepage,
+      :api_id,
+      :imdb_id,
+      :overview,
+      :popularity,
+      :poster_path,
+      :release_date,
+      :revenue,
+      :status,
+      :tagline,
+      :title,
+      :vote_average,
+      :vote_count
+    )
   end
 end
