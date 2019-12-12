@@ -12,7 +12,7 @@ class Api::V1::MoviesController < ApplicationController
   end
 
   def show
-    @movie = Movie.find_by(params[:id]) || RequestFromMovieApi.new(params).get_movie
+    @movie = Movie.find_by(api_id: params[:id]) || RequestFromMovieApi.new(params).get_movie
     render json: @movie
   end
 

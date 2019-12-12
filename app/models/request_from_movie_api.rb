@@ -32,9 +32,12 @@ class RequestFromMovieApi
   def search
     data = request(search_url, search_params)
 
-    data[:results].map do |movie_data|
+    ids = data[:results].map do |movie_data|
       create_movie(movie_data)
-    end
+    end.map(&:id)
+
+    # I wanted an active record relation here for ordering in the controller
+    Movie.where(id: ids)
   end
 
   private
@@ -46,7 +49,10 @@ class RequestFromMovieApi
   def create_movie(movie_data)
     movie_data[:api_id] = movie_data[:id]
     movie_data.slice!(*MOVIE_ATTRS)
-    Movie.find_or_create_by(movie_data)
+
+    movie = Movie.find_or_initialize_by(api_id: movie_data[:api_id])
+    movie.update_attributes(movie_data)
+    movie
   end
 
   def movie_url
