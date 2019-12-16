@@ -95,10 +95,10 @@ describe Api::V1::MoviesController do
 
   describe '#show' do
     context 'when a movie exists in db' do
-      let(:movie) { Movie.create(title: 'Frozen') }
+      let(:movie) { Movie.create(title: 'Frozen', api_id: 1234) }
 
       it 'returns the movie json' do
-        get :show, params: { id: movie.id }, format: :json
+        get :show, params: { id: movie.api_id }, format: :json
 
         expect(response.status).to eq 200
         expect(response.body).to include 'Frozen'
