@@ -4,6 +4,10 @@ describe RequestFromMovieApi do
   subject { described_class.new(params) }
   let(:params) { {} }
 
+  before do
+    allow(HotelEngine::Application.credentials).to receive(:movie_api_key).and_return '1234'
+  end
+
   context '#get_move' do
     let(:params) { { id: 330457 } }
 
